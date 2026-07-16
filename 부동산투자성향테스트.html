@@ -53,9 +53,9 @@ a{ color:var(--orange); }
 .track-card{ text-align:left; background:var(--light); border:2px solid var(--line); border-radius:20px; padding:26px 24px; cursor:pointer; transition:transform 0.3s var(--ease), box-shadow 0.3s ease, border-color 0.3s ease; }
 .track-card:hover{ transform:translateY(-4px); box-shadow:0 18px 36px -18px rgba(20,20,19,0.22); border-color:rgba(217,119,87,0.4); }
 .track-card.sel{ border-color:var(--orange); box-shadow:0 18px 36px -18px rgba(217,119,87,0.4); }
-.track-card .ico{ width:86px; height:86px; border-radius:24px; display:grid; place-items:center; margin-bottom:22px; background:linear-gradient(145deg,#244bff,#071022); box-shadow:0 20px 40px -24px rgba(36,75,255,.85); }
+.track-card .ico{ width:86px; height:86px; border-radius:24px; display:grid; place-items:center; margin-bottom:22px; background:#fff; box-shadow:0 20px 40px -24px rgba(36,75,255,.85); }
 .track-card .ico svg{ width:54px; height:54px; display:block; }
-.track-card .ico .accent{ fill:#ff8a1d; }
+.track-card .ico .accent{ fill:currentColor; stroke:none; }
 .track-card h3{ font-size:1.25rem; margin:10px 0 6px; }
 .track-card p{ margin:0; color:var(--mute); font-size:0.95rem; }
 .track-card .axes{ margin-top:14px; display:flex; flex-wrap:wrap; gap:6px; }
@@ -354,9 +354,18 @@ a{ color:var(--blue); }
   box-shadow:0 24px 60px -34px rgba(36,75,255,.72);
 }
 .track-card.sel{ background:linear-gradient(180deg,#fff,#f0f4ff); }
-.track-card .ico{ color:#fff; }
-.track-card[data-track="maemae"] .ico{ background:linear-gradient(145deg,#00d6ff,#244bff 58%,#071022); }
-.track-card[data-track="gyeongmae"] .ico{ background:linear-gradient(145deg,#ff8a1d,#244bff 62%,#071022); }
+.track-card[data-track="maemae"] .ico{
+  color:#2451ff;
+  background:linear-gradient(180deg,#f8fbff,#edf5ff);
+  border:1px solid rgba(36,81,255,.18);
+  box-shadow:0 18px 36px -26px rgba(36,81,255,.7);
+}
+.track-card[data-track="gyeongmae"] .ico{
+  color:#ff7a1a;
+  background:linear-gradient(180deg,#fff9f1,#fff0e2);
+  border:1px solid rgba(255,122,26,.22);
+  box-shadow:0 18px 36px -26px rgba(255,122,26,.72);
+}
 .miniaxis,.kchip,.result-code,.sc-tag{
   background:#e9eeff;
   color:#162cff;
@@ -755,8 +764,8 @@ function renderStart(){
     const m=TRACK_META[tk];
     const div=document.createElement('div'); div.className='track-card'; div.dataset.track=tk;
     const icon = m.ico==='auction'
-      ? '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M25 17l22 22" stroke="white" stroke-width="7" stroke-linecap="round"/><path d="M18 24l15-15 7 7-15 15-7-7Z" fill="rgba(255,255,255,.95)"/><path d="M34 40l8-8 5 5-8 8-5-5Z" fill="rgba(255,255,255,.95)"/><path d="M14 49h36" stroke="white" stroke-width="7" stroke-linecap="round"/><circle class="accent" cx="47" cy="18" r="5"/></svg>'
-      : '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M16 34L32 21l16 13v16H16V34Z" fill="rgba(255,255,255,.95)"/><path d="M25 50V38h14v12" fill="#244bff"/><path d="M21 31l11-9 11 9" stroke="white" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/><circle class="accent" cx="47" cy="20" r="5"/></svg>';
+      ? '<svg viewBox="0 0 64 64" aria-hidden="true" fill="none"><path d="M25 21l18 18" stroke="currentColor" stroke-width="4.6" stroke-linecap="round"/><path d="M17 26l13-13 8 8-13 13-8-8Z" stroke="currentColor" stroke-width="4.6" stroke-linejoin="round"/><path d="M37 42l8-8 6 6-8 8-6-6Z" stroke="currentColor" stroke-width="4.6" stroke-linejoin="round"/><path d="M14 51h36" stroke="currentColor" stroke-width="4.8" stroke-linecap="round"/><circle class="accent" cx="48" cy="17" r="4"/></svg>'
+      : '<svg viewBox="0 0 64 64" aria-hidden="true" fill="none"><path d="M15 32.5L32 19l17 13.5" stroke="currentColor" stroke-width="4.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 30v21h26V30" stroke="currentColor" stroke-width="4.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M27 51V39h10v12" stroke="currentColor" stroke-width="4.8" stroke-linejoin="round"/><path d="M23 51h18" stroke="currentColor" stroke-width="4.8" stroke-linecap="round"/><circle class="accent" cx="47" cy="19" r="4"/></svg>';
     div.innerHTML='<div class="ico">'+icon+'</div><h3>'+m.title+'</h3><p>'+m.desc+'</p>';
     div.onclick=()=>{
       document.querySelectorAll('.track-card').forEach(c=>c.classList.remove('sel'));
