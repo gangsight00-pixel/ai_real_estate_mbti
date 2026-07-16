@@ -378,40 +378,36 @@ a{ color:var(--blue); }
   overflow:hidden;
   margin:44px 0 8px;
   padding:0;
-  min-height:430px;
+  min-height:0;
+  aspect-ratio:1230/768;
   border-radius:0;
   color:#fff;
   text-align:center;
-  background:
-    linear-gradient(90deg, rgba(4,6,18,.78) 0%, rgba(7,9,20,.42) 45%, rgba(18,36,160,.18) 100%),
-    linear-gradient(180deg, rgba(0,0,0,.1) 0%, rgba(0,0,0,.64) 100%),
-    url('assets/course-banner.png');
-  background-size:cover;
+  background:url('assets/course-banner-final.png');
+  background-size:100% 100%;
   background-position:center;
+  background-repeat:no-repeat;
   box-shadow:0 30px 80px -52px rgba(7,9,20,.8);
 }
-.course-cta::before{
-  content:'';
-  position:absolute;
-  inset:0;
-  background:
-    radial-gradient(circle at 22% 48%, rgba(255,138,29,.18), transparent 27%),
-    radial-gradient(circle at 62% 18%, rgba(36,75,255,.32), transparent 32%);
-  opacity:1;
-}
+.course-cta::before,
 .course-cta::after{
-  content:'';
+  content:none;
+}
+.course-cta-link{
   position:absolute;
   inset:0;
-  background:linear-gradient(90deg, rgba(7,9,20,.72) 0%, rgba(7,9,20,.2) 52%, rgba(7,9,20,.08) 100%);
+  z-index:3;
+  display:block;
+  color:transparent;
+  text-decoration:none;
 }
 .course-cta-inner{
-  position:relative;
-  z-index:2;
-  max-width:760px;
-  margin:0;
-  padding:72px 28px 64px;
-  text-align:left;
+  position:absolute;
+  width:1px;
+  height:1px;
+  overflow:hidden;
+  clip:rect(0 0 0 0);
+  white-space:nowrap;
 }
 .course-eyebrow{
   display:inline-flex;
@@ -483,8 +479,7 @@ a{ color:var(--blue); }
   color:#1326d8;
 }
 @media (max-width:640px){
-  .course-cta{ min-height:420px; }
-  .course-cta-inner{ padding:52px 20px 54px; }
+  .course-cta{ aspect-ratio:1230/768; }
   .course-title{ font-size:2.6rem; }
   .course-sub{ font-size:.96rem; }
 }
@@ -832,10 +827,21 @@ function termHelpV2(it, isProfile){
   let list = sourceTerms.filter(t=>t.match.some(k=>text.indexOf(k)!==-1));
   if(!list.length && !isProfile) return '';
   if(!list.length) list = [{key:'내 조건', desc:'집 보유 여부, 쓸 수 있는 돈, 관심 지역처럼 결과를 더 현실적으로 만들기 위한 정보예요.'}];
-  const title = list.length===1 ? list[0].key+'이란?' : list.slice(0,2).map(t=>t.key).join(' · ')+'이란?';
+  const title = list.length===1 ? koreanTopicTitle(list[0].key) : koreanTopicTitle(list.slice(0,2).map(t=>t.key).join(' · '));
   return '<details class="term-note"><summary>'+esc(title)+'</summary><div class="term-body">'+
     list.map(t=>'<p><b>'+esc(t.key)+'</b>: '+esc(t.desc)+'</p>').join('')+
     '</div></details>';
+}
+
+function hasBatchim(word){
+  const ch = String(word).trim().slice(-1);
+  const code = ch.charCodeAt(0);
+  if(code < 0xAC00 || code > 0xD7A3) return false;
+  return ((code - 0xAC00) % 28) !== 0;
+}
+function koreanTopicTitle(label){
+  const last = String(label).split(' · ').pop();
+  return label + (hasBatchim(last) ? '이란?' : '란?');
 }
 
 function friendlyTypeName(code, fallback){
@@ -858,6 +864,27 @@ function friendlyTypeName(code, fallback){
     'A-bxwf':'큰돈으로 먼 지역의 복잡한 물건을 빠르게 정리하는 전문가형',
   };
   return map[code] || fallback;
+}
+
+function typeNameByCode(code){
+  for(const trackKey of Object.keys(DATA)){
+    const found = (DATA[trackKey].types||[]).find(t=>t.code===code);
+    if(found) return friendlyTypeName(code, found.name);
+  }
+  return '';
+}
+
+function expandTypeCodes(text){
+  return String(text||'').replace(/\b([MA]-[A-Za-z0-9]{4})\b(\(([^)]*)\))?/g, (full, code, _paren, note)=>{
+    const name = typeNameByCode(code);
+    if(!name) return full;
+    if(note) return code+'('+name+', '+note+')';
+    return code+'('+name+')';
+  });
+}
+
+function fmtPartner(text){
+  return fmt(expandTypeCodes(text));
 }
 
 function resultPromise(track, r){
@@ -1034,7 +1061,7 @@ function renderResult(track, r){
   if(p.market||p.partner){
     h+='<div class="sec"><div class="swb">';
     if(p.market) h+='<div class="panel"><h4>잘 맞는 시장</h4>'+fmt(p.market)+panelExtra('market',track,r)+'</div>';
-    if(p.partner) h+='<div class="panel"><h4>도움을 받으면 좋은 사람</h4>'+fmt(p.partner)+partnerHelp(p.partner)+panelExtra('partner',track,r)+'</div>';
+    if(p.partner) h+='<div class="panel"><h4>도움을 받으면 좋은 사람</h4>'+fmtPartner(p.partner)+partnerHelp(p.partner)+panelExtra('partner',track,r)+'</div>';
     h+='</div></div>';
   }
 
@@ -1059,13 +1086,12 @@ function renderResult(track, r){
     h+='</div>';
   }
 
-  h+='<div class="course-cta"><div class="course-cta-inner">'+
+  h+='<div class="course-cta"><a class="course-cta-link" href="https://bit.ly/4vt5THG" target="_blank" rel="noopener">강의 페이지 보러가기</a><div class="course-cta-inner">'+
      '<div class="course-eyebrow">AI REAL ESTATE AGENT</div>'+
      '<h3 class="course-title">내 조건에 맞는 물건을<br><span>100배 빠르게</span> 찾고 싶다면?</h3>'+
      '<p class="course-sub">경매 물건을 모으고, 내 예산에 맞게 줄이고, 실거래가와 입지까지 비교합니다.</p>'+
      '<p class="course-sub">권리·세금 리스크를 체크하고, 최종 입찰 판단 리포트까지 직접 만들어봅니다.</p>'+
      '<div class="course-points"><span>경매 물건 자동 수집</span><span>후보 TOP 5 압축</span><span>실거래가·입지 비교</span><span>수익률 계산기</span><span>권리·세무 리스크 체크</span><span>최종 판단 리포트</span></div>'+
-     '<a class="btn btn-primary" href="https://bit.ly/4vt5THG" target="_blank" rel="noopener">강의 페이지 보러가기 →</a>'+
      '</div></div>';
 
   h+='<div class="btn-row" style="margin-top:34px;">'+
@@ -1326,16 +1352,24 @@ function answerCodes(){
   return out;
 }
 function copyShare(){
-  const url=location.href;
+  const pageUrl='https://gangsight00-pixel.github.io/ai_real_estate_mbti/';
+  const url=location.protocol==='file:' ? pageUrl : location.href;
   const title='내 부동산 투자 성향 테스트 결과';
   const text='내 조건에 맞는 부동산 투자 성향 결과를 확인해보세요.';
+  const fallback=()=>{
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(url).then(()=>toast('공유 링크가 복사됐어요')).catch(()=>toast('공유 링크: '+url));
+    } else {
+      toast('공유 링크: '+url);
+    }
+  };
   if(navigator.share){
-    navigator.share({title:title, text:text, url:url}).then(()=>toast('공유창을 열었어요')).catch(()=>{});
+    try{
+      navigator.share({title:title, text:text, url:url}).then(()=>toast('공유창을 열었어요')).catch(fallback);
+    }catch(e){ fallback(); }
     return;
   }
-  if(navigator.clipboard && navigator.clipboard.writeText){
-    navigator.clipboard.writeText(url).then(()=>toast('공유 링크가 복사됐어요')).catch(()=>toast('주소창의 URL을 복사하세요'));
-  } else toast('주소창의 URL을 복사하세요');
+  fallback();
 }
 function toast(msg){ const t=$('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2200); }
 
