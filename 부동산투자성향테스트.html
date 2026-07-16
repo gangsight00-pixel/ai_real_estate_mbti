@@ -72,12 +72,27 @@ a{ color:var(--orange); }
 .note{ font-size:0.84rem; color:var(--mute); margin-top:18px; }
 
 @media (max-width:640px){
+  .screen{ min-height:auto; padding:26px 0 44px; }
+  .wrap{ padding:0 16px; }
+  .hero h1{ margin:12px 0 10px; font-size:2rem; }
+  .lead{ font-size:.95rem; line-height:1.55; }
   .track-grid{ grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin:28px 0 22px; }
   .track-card{ padding:18px 14px; border-radius:16px; }
   .track-card .ico{ width:56px; height:56px; border-radius:16px; margin-bottom:14px; }
   .track-card .ico svg{ width:34px; height:34px; }
   .track-card h3{ font-size:1rem; line-height:1.32; margin:8px 0 6px; }
   .track-card p{ font-size:.78rem; line-height:1.5; }
+  .quiz-top{ margin-bottom:4px; }
+  .bar{ height:5px; margin-bottom:18px; }
+  .qkind{ margin-bottom:10px; }
+  .qtext{ font-size:1.22rem; line-height:1.32; margin-bottom:6px; }
+  .qsub{ font-size:.84rem; margin-bottom:14px; }
+  .opts{ gap:8px; }
+  .opt{ padding:13px 14px; border-radius:12px; font-size:.94rem; line-height:1.38; gap:10px; }
+  .opt .mark{ width:18px; height:18px; }
+  .opt.sel .mark::after{ inset:4px; }
+  .nav-row{ margin-top:18px; }
+  .result-type{ word-break:keep-all; overflow-wrap:normal; line-break:strict; text-wrap:balance; font-size:1.9rem; }
   .btn-row{ flex-wrap:nowrap; gap:8px; }
   .btn-row .btn{ flex:1 1 0; min-width:0; padding:13px 8px; font-size:.88rem; white-space:nowrap; }
 }
@@ -1374,9 +1389,7 @@ function restart(){
 /* ---------- save / share via URL ---------- */
 function saveToURL(track, r){
   const payload={ t:track, p:r.profileValues||{}, a:answerCodes() };
-  const enc=encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(payload)))));
-  const url=location.pathname+'?r='+enc;
-  history.replaceState(null,'',url);
+  history.replaceState(null,'',location.pathname);
   try{ localStorage.setItem('rmbti_last', JSON.stringify(payload)); }catch(e){}
 }
 function answerCodes(){
@@ -1387,8 +1400,8 @@ function answerCodes(){
   return out;
 }
 function copyShare(){
-  const pageUrl='https://gangsight00-pixel.github.io/ai_real_estate_mbti/';
-  const url=location.protocol==='file:' ? pageUrl : location.href;
+  const pageUrl='https://ai-real-estate-mbti.vercel.app/';
+  const url=pageUrl;
   const title='내 부동산 투자 성향 테스트 결과';
   const text='내 조건에 맞는 부동산 투자 성향 결과를 확인해보세요.';
   const fallback=()=>{
